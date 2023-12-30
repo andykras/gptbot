@@ -40,7 +40,7 @@ export BOT_TOKEN="..."
 ```
 
 4. **Prepare YAML files:**
-   - `allowed_users.yaml`: Optional, add this file to restrict access to your chatGPT bot.
+   - `allowed_users.yaml`: Optional, add this file to restrict access to your ChatGPT bot.
    - `threads.yaml`: Will be created by the bot.
    - `tutors.yaml`: Will be created by the bot; ensure a valid default is set in `assistants_factory.py`.
 
