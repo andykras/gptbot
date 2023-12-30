@@ -30,12 +30,13 @@ async def on_tutor(message: types.Message) -> None:
   )
 
 
+async def on_change(message: types.Message) -> None:
+  await change_assistant(message)
+
+
 async def on_message(message: types.Message) -> None:
   try:
-    if message.text in await get_assistant():
-      await change_assistant(message)
-    else:
-      await handle_response(message)
+    await handle_response(message)
   except TypeError as error:
     logger.error(error)
     await message.answer(_t("bot.error_in_the_code"))
