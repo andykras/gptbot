@@ -1,9 +1,9 @@
 import yaml
 from datetime import datetime, timedelta
 from openai import AsyncOpenAI
-from logger import createLogger
+from logger import create_logger
 
-logger = createLogger("users")
+logger = create_logger("users")
 
 
 def assistants_factory(client: AsyncOpenAI):

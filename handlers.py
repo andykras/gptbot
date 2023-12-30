@@ -1,10 +1,10 @@
 from aiogram import types
 from actions import change_assistant, handle_response
 from client import get_thread, get_assistant
-from logger import createLogger
+from logger import create_logger
 from translate import _t
 
-logger = createLogger("handlers")
+logger = create_logger("handlers")
 
 
 async def on_start(message: types.Message) -> None:

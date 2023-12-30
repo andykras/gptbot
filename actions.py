@@ -3,11 +3,11 @@ import asyncio
 from openai.types import beta
 from aiogram import types
 from client import client, get_thread, get_assistant
-from logger import createLogger
+from logger import create_logger
 from users import check_user
 from translate import _t
 
-logger = createLogger("actions")
+logger = create_logger("actions")
 
 
 async def change_assistant(message: types.Message):

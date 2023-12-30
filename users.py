@@ -1,7 +1,7 @@
 import yaml
-from logger import createLogger
+from logger import create_logger
 
-logger = createLogger("users")
+logger = create_logger("users")
 
 """
 add this file if you want to restrict access to your chatgpt bot
