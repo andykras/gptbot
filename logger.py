@@ -1,0 +1,11 @@
+import sys
+import logging
+from os import getenv
+
+LOG_LEVEL = getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=LOG_LEVEL, stream=sys.stdout)
+
+
+def createLogger(module_name):
+  logger = logging.getLogger(module_name)
+  return logger
