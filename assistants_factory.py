@@ -1,5 +1,6 @@
 import yaml
 from datetime import datetime, timedelta
+from aiogram import types
 from openai import AsyncOpenAI
 from logger import create_logger
 
@@ -49,4 +50,7 @@ def assistants_factory(client: AsyncOpenAI):
 
     return cache[user_id]["assistant"]
 
-  return get_assistant
+  def asst_filter(message: types.Message):
+    return message.text in tutors
+
+  return (get_assistant, asst_filter)
