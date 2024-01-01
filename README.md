@@ -49,7 +49,7 @@ export BOT_TOKEN="..."
 To start the bot, run:
 
 ```bash
-python gptbot.py
+python main.py
 ```
 
 Interact with your ChatGPT bot via Telegram and enjoy conversing with AI!
@@ -61,7 +61,7 @@ Interact with your ChatGPT bot via Telegram and enjoy conversing with AI!
 
 
 ```bash
-$ LC_ALL=ru_RU python gptbot.py | lolcat
+$ LC_ALL=ru_RU python main.py | lolcat
 INFO:aiogram.dispatcher:Start polling
 INFO:aiogram.dispatcher:Run polling for bot @*****bot id=******* - 'ChatGPT 3.5'
 INFO:httpx:HTTP Request: GET https://api.openai.com/v1/assistants/asst_******** "HTTP/1.1 200 OK"
