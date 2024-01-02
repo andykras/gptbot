@@ -6,7 +6,7 @@
 
 ## Overview
 
-This project is a Telegram bot leveraging the new Assistance API of OpenAI to integrate the conversational intelligence of ChatGPT into Telegram. Utilizing the AsyncOpenAI client, it allows users to interact with a GPT-powered assistant directly through Telegram messages, providing a seamless and efficient experience.
+This project is a Telegram bot that uses OpenAI's Assistant API to bring ChatGPT to Telegram. It uses the AsyncOpenAI client and aiogram lib 
 
 ## Dependencies
 
@@ -52,7 +52,7 @@ To start the bot, run:
 python main.py
 ```
 
-Interact with your ChatGPT bot via Telegram and enjoy conversing with AI!
+Interact with your ChatGPT bot via Telegram
 
 ## Notes
 
