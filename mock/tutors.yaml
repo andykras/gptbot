@@ -1,0 +1,13 @@
+- default:
+    desc: default assistant
+    id: asst_id1_from_openai
+  fast:
+    desc: fast assistant
+    id: asst_id2_from_openai
+  guru:
+    desc: meditation helper
+    id: asst_id3_from_openai
+  math:
+    desc: math tutor
+    id: asst_id4_from_openai
+- 123: fast

@@ -7,7 +7,7 @@ from logger import create_logger
 from users import check_user
 from translate import _t
 
-logger = create_logger("actions")
+logger = create_logger(__name__)
 
 
 async def change_assistant(message: types.Message):
