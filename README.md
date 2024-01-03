@@ -84,3 +84,29 @@ INFO:actions:assistant:asst_********:
 INFO:actions:done
 INFO:aiogram.event:Update id=96266760 is handled. Duration 3059 ms by bot id=*******
 ```
+
+
+## Tests
+
+To run tests:
+
+```bash
+pip install pytest pytest-asyncio freezegun
+pytest -vv test.py
+```
+
+| Test Case                                  | Status  | Progress |
+|--------------------------------------------|---------|----------|
+| test_retrieve_existing_thread              | PASSED  |  9%      |
+| test_clear_context                         | PASSED  | 18%      |
+| test_cache_thread_expiration               | PASSED  | 27%      |
+| test_create_thread_for_new_user            | PASSED  | 36%      |
+| test_get_list_of_assistants                | PASSED  | 45%      |
+| test_get_current_assistant                 | PASSED  | 54%      |
+| test_change_assistant                      | PASSED  | 63%      |
+| test_defaults                              | PASSED  | 72%      |
+| test_check_allowed_users[123-True]         | PASSED  | 81%      |
+| test_check_allowed_users[456-True]         | PASSED  | 90%      |
+| test_check_allowed_users[789-False]        | PASSED  | 100%     |
+
+Total tests: 11, Passed: 11, Duration: 1.73s
