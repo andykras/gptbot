@@ -3,22 +3,22 @@ from datetime import datetime, timedelta
 from openai import AsyncOpenAI
 from logger import create_logger
 
-logger = create_logger("users")
+logger = create_logger(__name__)
 
 
-def thread_factory(client: AsyncOpenAI):
+def threads_factory(client: AsyncOpenAI):
   storage = "threads.yaml"
   threads = {}
   cache = {}
 
-  def load_threads():
+  def load():
     try:
       with open(storage, 'r') as file:
         return yaml.safe_load(file) or {}
     except FileNotFoundError:
       return {}
 
-  def save_threads():
+  def save():
     with open(storage, 'w') as file:
       yaml.dump(threads, file, allow_unicode=True)
 
@@ -26,7 +26,7 @@ def thread_factory(client: AsyncOpenAI):
     now = datetime.now()
 
     if not threads:
-      threads.update(load_threads())
+      threads.update(load())
 
     if new_thread:
       threads.pop(user_id, None)
@@ -34,7 +34,7 @@ def thread_factory(client: AsyncOpenAI):
     needs_update = (
         user_id not in threads or
         user_id not in cache or
-        (now - cache[user_id]["expire_date"]).total_seconds() > 86400
+        now - cache[user_id]["expire_date"] > timedelta(days=1)
     )
 
     if needs_update:
@@ -50,7 +50,7 @@ def thread_factory(client: AsyncOpenAI):
           "expire_date": now + timedelta(days=1),
           "thread": thread
       }
-      save_threads()
+      save()
 
     return cache[user_id]["thread"]
 

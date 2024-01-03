@@ -1,7 +1,7 @@
 import yaml
 from logger import create_logger
 
-logger = create_logger("users")
+logger = create_logger(__name__)
 
 try:
   with open("allowed_users.yaml", 'r') as file:

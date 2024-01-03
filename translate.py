@@ -2,7 +2,7 @@ from locale import getdefaultlocale
 from messages import messages
 from logger import create_logger
 
-logger = create_logger("translate")
+logger = create_logger(__name__)
 
 lang = getdefaultlocale()[0]
 lang = lang if lang in messages else "en_US"
