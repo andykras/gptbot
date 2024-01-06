@@ -1,12 +1,10 @@
 # ChatGPT Telegram Bot
 
+This project is a Telegram bot that uses OpenAI's Assistant API to bring ChatGPT to Telegram. It uses the AsyncOpenAI client and aiogram lib  
+
 <div align="center">
   <img src="tg.jpg" alt="GPT Bot Image">
 </div>
-
-## Overview
-
-This project is a Telegram bot that uses OpenAI's Assistant API to bring ChatGPT to Telegram. It uses the AsyncOpenAI client and aiogram lib 
 
 ## Dependencies
 
@@ -110,3 +108,26 @@ pytest -vv test.py
 | test_check_allowed_users[789-False]        | PASSED  | 100%     |
 
 Total tests: 11, Passed: 11, Duration: 1.73s
+
+## Deploy
+
+Bot has been successfully deployed on the Digital Ocean platform:
+
+```bash
+sudo systemctl status gptbot.service
+🟢 gptbot.service - ChatGPT Telegram Bot
+     Loaded: loaded (/etc/systemd/system/gptbot.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sat 2024-01-06 07:06:54 UTC; 16h ago
+    Process: 179583 ExecStart=/usr/bin/tmux new-session -d -s gptbot LC_ALL=ru_RU.UTF-8 python main.py (code=exited, status=0/SUCCESS)
+   Main PID: 179585 (tmux: server)
+      Tasks: 4 (limit: 498)
+     Memory: 96.5M
+        CPU: 16.939s
+     CGroup: /system.slice/gptbot.service
+             ├─179585 /usr/bin/tmux new-session -d -s gptbot "LC_ALL=ru_RU.UTF-8 python main.py"
+             ├─179586 sh -c "LC_ALL=ru_RU.UTF-8 python main.py"
+             └─179588 python main.py
+
+Jan 06 07:06:54 vpn systemd[1]: Starting ChatGPT Telegram Bot...
+Jan 06 07:06:54 vpn systemd[1]: Started ChatGPT Telegram Bot.
+```
