@@ -114,7 +114,7 @@ Total tests: 11, Passed: 11, Duration: 1.73s
 Bot has been successfully deployed on the Digital Ocean platform:
 
 ```bash
-sudo systemctl status gptbot.service
+$ sudo systemctl status gptbot.service
 🟢 gptbot.service - ChatGPT Telegram Bot
      Loaded: loaded (/etc/systemd/system/gptbot.service; enabled; vendor preset: enabled)
      Active: active (running) since Sat 2024-01-06 07:06:54 UTC; 16h ago
@@ -130,4 +130,7 @@ sudo systemctl status gptbot.service
 
 Jan 06 07:06:54 vpn systemd[1]: Starting ChatGPT Telegram Bot...
 Jan 06 07:06:54 vpn systemd[1]: Started ChatGPT Telegram Bot.
+
+$ tmux ls
+gptbot: 1 windows (created Sat Jan  6 07:06:54 2024)
 ```
