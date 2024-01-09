@@ -1,9 +1,9 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart, Command
-from actions import change_assistant, handle_response
-from client import get_thread, get_assistant, asst_filter
-from logger import create_logger
-from translate import _t
+from .actions import change_assistant, handle_response
+from .client import get_thread, get_assistant, asst_filter
+from .logger import create_logger
+from .translate import _t
 
 logger = create_logger(__name__)
 router = Router()

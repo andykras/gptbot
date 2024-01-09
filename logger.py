@@ -1,6 +1,6 @@
 import sys
 import logging
-import env
+from . import env
 
 logging.basicConfig(level=env.LOG_LEVEL, stream=sys.stdout)
 
