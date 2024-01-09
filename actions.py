@@ -43,8 +43,7 @@ async def handle_response(message: types.Message):
 async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: types.Message):
   run = await client.beta.threads.runs.create(
       thread.id,
-      assistant_id=assistant.id,
-      instructions=_t("gpt.instructions", name=message.from_user.first_name)
+      assistant_id=assistant.id
   )
 
   start_time = time.time()
