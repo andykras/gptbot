@@ -4,6 +4,7 @@ from .actions import change_assistant, handle_response
 from .client import get_thread, get_assistant, asst_filter
 from .logger import create_logger
 from .translate import _t
+from .helpers import escape_markdown
 
 logger = create_logger(__name__)
 router = Router()
@@ -11,7 +12,7 @@ router = Router()
 
 @router.message(CommandStart())
 async def on_start(message: types.Message) -> None:
-  await message.answer(text=_t("bot.welcome", name=message.from_user.full_name, id=message.from_user.id))
+  await message.answer(_t("bot.welcome", name=escape_markdown(message.from_user.full_name), id=message.from_user.id))
   logger.info(f"on_start:{message.from_user.username}:{message.from_user.id}")
 
 
