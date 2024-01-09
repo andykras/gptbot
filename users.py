@@ -34,7 +34,7 @@ def is_user_not_allowed(message: types.Message):
   if message.from_user.is_bot:
     return True
 
-  if "GROUP_ID" in env:
+  if hasattr(env, "GROUP_ID"):
     return check_group(message.chat.id)
 
   return check_user(message.from_user)
