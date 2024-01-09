@@ -38,8 +38,8 @@ def assistants_factory(client: AsyncOpenAI):
 
     if not tutors:
       data = load()
-      tutors.update(data[0])
-      user_prefs.update(data[1])
+      tutors.update(data[0] if len(data) > 0 else {})
+      user_prefs.update(data[1] if len(data) > 1 else {})
 
     if user_id is None:
       return tutors
