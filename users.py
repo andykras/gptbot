@@ -6,23 +6,25 @@ from aiogram import types
 
 logger = create_logger(__name__)
 allowed_users = set()
+banned_users = set()
 
 
-def load_allowed_users():
+def load_users(filename):
   try:
-    with open(Path(__file__).parent / "allowed_users.yaml", 'r') as file:
-      return set(yaml.safe_load(file) or [])
+    with open(Path(__file__).parent / filename, 'r') as file:
+      return set(yaml.safe_load(file) or [-1])
   except FileNotFoundError:
-    return set()
+    return set([-1])
 
 
 def check_user(user: types.User):
   if not allowed_users:
-    allowed_users.update(load_allowed_users())
+    allowed_users.update(load_users("allowed_users.yaml"))
 
   if user.id not in allowed_users:
     logger.fatal(f"user '{user.username}' is not allowed, id={user.id}")
     return True
+
   return False
 
 
@@ -38,3 +40,14 @@ def is_user_not_allowed(message: types.Message):
     return check_group(message.chat.id)
 
   return check_user(message.from_user)
+
+
+def is_user_banned(user_id):
+  if not banned_users:
+    banned_users.update(load_users("banned_users.yaml"))
+
+  if user_id in banned_users:
+    logger.debug(f"user is banned, id={user_id}")
+    return True
+
+  return False
