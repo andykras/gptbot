@@ -7,6 +7,7 @@ from .logger import create_logger
 from .users import is_user_not_allowed
 from .translate import _t
 from . import env
+from .helpers import is_valid_markdown, escape_markdown
 
 
 logger = create_logger(__name__)
@@ -43,7 +44,12 @@ async def handle_response(message: types.Message):
 async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: types.Message):
   run = await client.beta.threads.runs.create(
       thread.id,
-      assistant_id=assistant.id
+      assistant_id=assistant.id,
+      instructions=_t("gpt.instructions",
+                      name=message.from_user.first_name,
+                      id=message.from_user.id,
+                      full_name=message.from_user.full_name,
+                      instructions=assistant.instructions)
   )
 
   start_time = time.time()
@@ -85,8 +91,11 @@ async def retrieve_messages(thread_id, run_id, message: types.Message):
 
       content = msg.content[0].text.value
       if content:
+        escaped = not is_valid_markdown(content)
+        if escaped:
+          content = escape_markdown(content)
+        logger.info(f"{msg.role}:{step.assistant_id}:escaped={escaped}:\n\t{content}")
         await message.answer(content)
-        logger.info(f"{msg.role}:{step.assistant_id}:\n\t{content}")
 
 
 async def add_message_to_thread(thread: beta.Thread, message: types.Message):
