@@ -4,7 +4,7 @@ from openai.types import beta
 from aiogram import types
 from .client import client, get_thread, get_assistant
 from .logger import create_logger
-from .users import is_user_not_allowed
+from .users import is_user_not_allowed, is_user_banned
 from .translate import _t
 from . import env
 from .helpers import is_valid_markdown, escape_markdown
@@ -27,6 +27,9 @@ async def handle_response(message: types.Message):
 
   if is_user_not_allowed(message):
     return await message.answer(_t("bot.not_allowed", id=user_id))
+
+  if is_user_banned(user_id):
+    return
 
   logger.info(f"user:{username}:{user_id}\n\t{message.md_text}")
 
