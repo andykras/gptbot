@@ -2,12 +2,13 @@ import pytest
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from unittest.mock import AsyncMock, patch, mock_open
-from threads_factory import threads_factory
-from assistants_factory import assistants_factory
+from pathlib import Path
+from .threads_factory import threads_factory
+from .assistants_factory import assistants_factory
 
 
 def load_mock_data(file_name):
-  with open(f"./mock/{file_name}", 'r') as file:
+  with open(Path(__file__).parent / "mock" / file_name, 'r') as file:
     return file.read()
 
 
@@ -85,7 +86,7 @@ async def test_defaults():
     tutors = await get_assistant()
     assert "default" in tutors
     assert tutors["default"]["id"] == "asst_id_from_openai"
-    mock_tutors_file.assert_called_with("tutors.yaml", 'r')
+    mock_tutors_file.assert_called_with(Path(__file__).parent / "tutors.yaml", 'r')
 
 
 @pytest.mark.parametrize("user_id,expected", [
@@ -95,5 +96,7 @@ async def test_defaults():
 ])
 def test_check_allowed_users(user_id, expected):
   with patch("builtins.open", mock_open(read_data=mock_allowed_users)):
-    from users import check_user
-    assert not check_user(user_id, f"username{user_id}") == expected
+    from .users import check_user
+    from collections import namedtuple
+    UserMock = namedtuple("UserMock", ["id", "username"])
+    assert not check_user(UserMock(id=user_id, username=user_id)) == expected

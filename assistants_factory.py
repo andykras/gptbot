@@ -2,13 +2,14 @@ import yaml
 from datetime import datetime, timedelta
 from aiogram import types
 from openai import AsyncOpenAI
-from logger import create_logger
+from .logger import create_logger
+from pathlib import Path
 
 logger = create_logger(__name__)
 
 
 def assistants_factory(client: AsyncOpenAI):
-  storage = "tutors.yaml"
+  storage = Path(__file__).parent / "tutors.yaml"
   tutors = {}
   user_prefs = {}
   cache = {}

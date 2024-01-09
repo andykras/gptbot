@@ -1,6 +1,6 @@
 from locale import getdefaultlocale
-from messages import messages
-from logger import create_logger
+from .messages import messages
+from .logger import create_logger
 
 logger = create_logger(__name__)
 

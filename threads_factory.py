@@ -1,13 +1,14 @@
 import yaml
 from datetime import datetime, timedelta
 from openai import AsyncOpenAI
-from logger import create_logger
+from .logger import create_logger
+from pathlib import Path
 
 logger = create_logger(__name__)
 
 
 def threads_factory(client: AsyncOpenAI):
-  storage = "threads.yaml"
+  storage = Path(__file__).parent / "threads.yaml"
   threads = {}
   cache = {}
 

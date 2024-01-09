@@ -2,10 +2,12 @@ import time
 import asyncio
 from openai.types import beta
 from aiogram import types
-from client import client, get_thread, get_assistant
-from logger import create_logger
-from users import check_user
-from translate import _t
+from .client import client, get_thread, get_assistant
+from .logger import create_logger
+from .users import is_user_not_allowed
+from .translate import _t
+from . import env
+
 
 logger = create_logger(__name__)
 
@@ -21,7 +23,8 @@ async def change_assistant(message: types.Message):
 async def handle_response(message: types.Message):
   user_id = message.from_user.id
   username = message.from_user.username
-  if check_user(user_id, username):
+
+  if is_user_not_allowed(message):
     return await message.answer(_t("bot.not_allowed", id=user_id))
 
   logger.info(f"user:{username}:{user_id}\n\t{message.md_text}")
@@ -56,7 +59,7 @@ async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: ty
       logger.info("failed")
       break
     else:
-      await asyncio.sleep(1)
+      await asyncio.sleep(env.THREADS_RUN_POLLING_TIMEOUT)
 
     run = await client.beta.threads.runs.retrieve(
         run.id,
