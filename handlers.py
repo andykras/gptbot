@@ -5,15 +5,17 @@ from .client import get_thread, get_assistant, asst_filter
 from .logger import create_logger
 from .translate import _t
 from .helpers import escape_markdown
+from .users import access_middleware
 
 logger = create_logger(__name__)
 router = Router()
+router.message.middleware(access_middleware)
 
 
 @router.message(CommandStart())
 async def on_start(message: types.Message) -> None:
-  await message.answer(_t("bot.welcome", name=escape_markdown(message.from_user.full_name), id=message.from_user.id))
   logger.info(f"on_start:{message.from_user.username}:{message.from_user.id}")
+  await message.answer(_t("bot.welcome", name=escape_markdown(message.from_user.full_name), id=message.from_user.id))
 
 
 @router.message(Command("new"))

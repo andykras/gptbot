@@ -1,5 +1,6 @@
 import yaml
 from .logger import create_logger
+from .translate import _t
 from . import env
 from pathlib import Path
 from aiogram import types
@@ -51,3 +52,26 @@ def is_user_banned(user_id):
     return True
 
   return False
+
+
+async def has_access(message: types.Message):
+  user_id = message.from_user.id
+
+  if is_user_not_allowed(message):
+    await message.answer(_t("bot.not_allowed", id=user_id))
+    return False
+
+  if is_user_banned(user_id):
+    return False
+
+  return True
+
+
+async def access_middleware(handler, message: types.Message, data):
+  logger.debug(f"middleware:{message}")
+
+  if message.text is None:
+    return
+
+  if message.text == "/start" or await has_access(message):
+    return await handler(message, data)
