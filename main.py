@@ -1,8 +1,7 @@
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from handlers import router
-import env
-import asyncio
+from .handlers import router
+from . import env
 
 
 async def main():
@@ -12,6 +11,3 @@ async def main():
   dp.include_router(router)
 
   await dp.start_polling(bot)
-
-
-asyncio.run(main())

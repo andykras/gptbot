@@ -47,7 +47,7 @@ export BOT_TOKEN="..."
 To start the bot, run:
 
 ```bash
-python main.py
+python -m gptbot
 ```
 
 Interact with your ChatGPT bot via Telegram
@@ -59,7 +59,7 @@ Interact with your ChatGPT bot via Telegram
 
 
 ```bash
-$ LC_ALL=ru_RU python main.py | lolcat
+$ LC_ALL=ru_RU python -m gptbot | lolcat
 INFO:aiogram.dispatcher:Start polling
 INFO:aiogram.dispatcher:Run polling for bot @*****bot id=******* - 'ChatGPT 3.5'
 INFO:httpx:HTTP Request: GET https://api.openai.com/v1/assistants/asst_******** "HTTP/1.1 200 OK"
@@ -118,15 +118,15 @@ $ sudo systemctl status gptbot.service
 🟢 gptbot.service - ChatGPT Telegram Bot
      Loaded: loaded (/etc/systemd/system/gptbot.service; enabled; vendor preset: enabled)
      Active: active (running) since Sat 2024-01-06 07:06:54 UTC; 16h ago
-    Process: 179583 ExecStart=/usr/bin/tmux new-session -d -s gptbot LC_ALL=ru_RU.UTF-8 python main.py (code=exited, status=0/SUCCESS)
+    Process: 179583 ExecStart=/usr/bin/tmux new-session -d -s gptbot LC_ALL=ru_RU.UTF-8 python -m gptbot (code=exited, status=0/SUCCESS)
    Main PID: 179585 (tmux: server)
       Tasks: 4 (limit: 498)
      Memory: 96.5M
         CPU: 16.939s
      CGroup: /system.slice/gptbot.service
-             ├─179585 /usr/bin/tmux new-session -d -s gptbot "LC_ALL=ru_RU.UTF-8 python main.py"
-             ├─179586 sh -c "LC_ALL=ru_RU.UTF-8 python main.py"
-             └─179588 python main.py
+             ├─179585 /usr/bin/tmux new-session -d -s gptbot "LC_ALL=ru_RU.UTF-8 python -m gptbot"
+             ├─179586 sh -c "LC_ALL=ru_RU.UTF-8 python -m gptbot"
+             └─179588 python -m gptbot
 
 Jan 06 07:06:54 vpn systemd[1]: Starting ChatGPT Telegram Bot...
 Jan 06 07:06:54 vpn systemd[1]: Started ChatGPT Telegram Bot.
