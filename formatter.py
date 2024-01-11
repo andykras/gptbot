@@ -81,7 +81,6 @@ class ColorFormatter(logging.Formatter):
   def _replace_link(self, match):
     link = f"{self.URL_COLOR}{match.group(0)}{self.RESET_COLOR}"
     link_hash = self.get_hash(link)
-    print(link_hash)
     self.LINKS[link_hash] = link
     return link_hash
 
