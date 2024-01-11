@@ -1,8 +1,8 @@
-import sys
+from .formatter import ColorFormatter
 import logging
 from . import env
 
-logging.basicConfig(level=env.LOG_LEVEL, stream=sys.stdout)
+logging.basicConfig(level=env.LOG_LEVEL, handlers=[ColorFormatter.get_handler()])
 
 
 def create_logger(module_name):
