@@ -1,5 +1,7 @@
 import time
 import asyncio
+from typing import Dict, Deque
+from collections import deque
 from openai.types import beta
 from aiogram import types
 from .client import client, get_thread, get_assistant
@@ -10,6 +12,14 @@ from .helpers import is_valid_markdown, escape_markdown
 
 
 logger = create_logger(__name__)
+
+
+class Messages:
+  queue: Deque[str] = deque()
+  has_active_run: bool = False
+
+
+message_queues: Dict[str, Messages] = {}  # key is beta.Thread.id
 
 
 async def change_assistant(message: types.Message):
@@ -27,17 +37,30 @@ async def handle_response(message: types.Message):
   logger.info(f"user:{username}:{user_id}\n\t{message.md_text}")
 
   thread = await get_thread(user_id)
-  logger.debug(thread)
+  logger.debug(f"handle_response:{thread}")
+
+  add_message_to_queue(thread, message)
+
+  assistant = await get_assistant(user_id)
+  logger.debug(f"handle_response:{assistant}")
+
+  await process_message(thread, assistant)
+
+
+async def process_message(thread: beta.Thread, assistant: beta.Assistant):
+
+  messages = message_queues[thread.id]
+
+  while messages.has_active_run:
+    await asyncio.sleep(1)
+
+  messages.has_active_run = True
+
+  message = messages.queue.popleft()
+  logger.debug(f"process_message:{thread.id}:{message.message_id}")
 
   await add_message_to_thread(thread, message)
 
-  assistant = await get_assistant(user_id)
-  logger.debug(assistant)
-
-  await create_run(thread, assistant, message)
-
-
-async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: types.Message):
   run = await client.beta.threads.runs.create(
       thread.id,
       assistant_id=assistant.id,
@@ -50,14 +73,14 @@ async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: ty
 
   start_time = time.time()
   while True:
-    logger.info(f"status:{run.status}")
+    logger.info(f"process_message:status:{run.status}")
 
     if run.status == "completed":
       await retrieve_messages(thread.id, run.id, message)
-      logger.info("done")
+      logger.info("process_message:done")
       break
     elif run.status in ["failed", "cancelled", "expired"]:
-      logger.info("failed")
+      logger.info("process_message:failed")
       break
     else:
       await asyncio.sleep(env.THREADS_RUN_POLLING_TIMEOUT)
@@ -67,7 +90,11 @@ async def create_run(thread: beta.Thread, assistant: beta.Assistant, message: ty
         thread_id=thread.id
     )
   end_time = time.time()
-  logger.debug(f"reponse time: {end_time - start_time:.2f}s")
+  logger.debug(f"process_message:reponse time: {end_time - start_time:.2f}s")
+
+  messages.has_active_run = False
+  if not messages.queue:
+    message_queues.pop(thread.id)
 
 
 async def retrieve_messages(thread_id, run_id, message: types.Message):
@@ -90,7 +117,7 @@ async def retrieve_messages(thread_id, run_id, message: types.Message):
         escaped = not is_valid_markdown(content)
         if escaped:
           content = escape_markdown(content)
-        logger.info(f"{msg.role}:{step.assistant_id}:escaped={escaped}:\n\t{content}")
+        logger.info(f"retrieve_messages:{msg.role}:{step.assistant_id}:escaped={escaped}:\n\t{content}")
         await message.answer(content)
 
 
@@ -100,4 +127,9 @@ async def add_message_to_thread(thread: beta.Thread, message: types.Message):
       role="user",
       content=message.md_text
   )
-  logger.debug(user_request)
+  logger.debug(f"add_message_to_thread:{user_request.id}")
+
+
+def add_message_to_queue(thread: beta.Thread, message: types.Message):
+  messages = message_queues.setdefault(thread.id, Messages())
+  messages.queue.append(message)
