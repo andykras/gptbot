@@ -22,13 +22,13 @@ async def on_start(message: types.Message) -> None:
 async def on_new(message: types.Message) -> None:
   await message.answer(_t("bot.new_chat"))
   thread = await get_thread(message.from_user.id, new_thread=True)
-  logger.debug(thread)
+  logger.debug(f"on_new:{thread}")
 
 
 @router.message(Command("tutor"))
 async def on_tutor(message: types.Message) -> None:
   tutors = await get_assistant()
-  logger.info(tutors)
+  logger.info(f"on_tutor:{[id for id, _ in tutors.items()]}")
   await message.answer(
       _t("bot.new_tutor", tutors="\n".join([f"`{id}`: {info['desc']}" for id, info in tutors.items()])),
       reply_markup=types.ReplyKeyboardMarkup(
@@ -48,5 +48,5 @@ async def on_message(message: types.Message) -> None:
   try:
     await handle_response(message)
   except TypeError as error:
-    logger.error(error)
+    logger.error(f"on_message:{error}")
     await message.answer(_t("bot.error_in_the_code"))
