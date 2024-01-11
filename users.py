@@ -64,6 +64,9 @@ async def has_access(message: types.Message):
   if is_user_banned(user_id):
     return False
 
+  if not check_group(message.chat.id) and message.reply_to_message is not None:
+    return message.reply_to_message.from_user.is_bot
+
   return True
 
 
