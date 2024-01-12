@@ -1,21 +1,23 @@
 import time
 import asyncio
-from typing import Dict, Deque
-from collections import deque
+from typing import Dict, List
+from collections import defaultdict
 from openai.types import beta
 from aiogram import types
+
 from .client import client, get_thread, get_assistant
 from .logger import create_logger
 from .translate import _t
 from . import env
 from .helpers import is_valid_markdown, escape_markdown
+from .users import is_group_bot
 
 
 logger = create_logger(__name__)
 
 
 class Messages:
-  queue: Deque[str] = deque()
+  queue: Dict[int, List[types.Message]] = defaultdict(list)
   has_active_run: bool = False
 
 
@@ -39,27 +41,31 @@ async def handle_response(message: types.Message):
   thread = await get_thread(user_id)
   logger.debug(f"handle_response:{thread}")
 
-  add_message_to_queue(thread, message)
+  if not start_message_queue(thread, message):
+    return
 
   assistant = await get_assistant(user_id)
   logger.debug(f"handle_response:{assistant}")
 
-  await process_message(thread, assistant)
+  delay = env.GROUP_BOT_RESPONSE_DELAY if is_group_bot() else env.BOT_RESPONSE_DELAY
+  if delay > 0:
+    await asyncio.sleep(delay)
+
+  await process_message(thread, assistant, message)
 
 
-async def process_message(thread: beta.Thread, assistant: beta.Assistant):
+async def process_message(thread: beta.Thread, assistant: beta.Assistant, message: types.Message):
 
   messages = message_queues[thread.id]
 
   while messages.has_active_run:
-    await asyncio.sleep(1)
+    await asyncio.sleep(env.THREADS_RUN_WAIT_SLEEP)
 
   messages.has_active_run = True
 
-  message = messages.queue.popleft()
   logger.debug(f"process_message:{thread.id}:{message.message_id}")
 
-  await add_message_to_thread(thread, message)
+  await add_message_to_thread(thread, messages.queue.pop(message.from_user.id))
 
   run = await client.beta.threads.runs.create(
       thread.id,
@@ -83,7 +89,7 @@ async def process_message(thread: beta.Thread, assistant: beta.Assistant):
       logger.info("process_message:failed")
       break
     else:
-      await asyncio.sleep(env.THREADS_RUN_POLLING_TIMEOUT)
+      await asyncio.sleep(env.RUN_STATUS_POLL_INTERVAL)
 
     run = await client.beta.threads.runs.retrieve(
         run.id,
@@ -121,15 +127,19 @@ async def retrieve_messages(thread_id, run_id, message: types.Message):
         await message.answer(content)
 
 
-async def add_message_to_thread(thread: beta.Thread, message: types.Message):
+async def add_message_to_thread(thread: beta.Thread, messages: List[types.Message]):
   user_request = await client.beta.threads.messages.create(
       thread.id,
       role="user",
-      content=message.md_text
+      content="\n".join(message.md_text for message in messages)
   )
   logger.debug(f"add_message_to_thread:{user_request.id}")
 
 
-def add_message_to_queue(thread: beta.Thread, message: types.Message):
+def start_message_queue(thread: beta.Thread, message: types.Message):
   messages = message_queues.setdefault(thread.id, Messages())
-  messages.queue.append(message)
+
+  user_id = message.from_user.id
+  messages.queue[user_id].append(message)
+
+  return len(messages.queue[user_id]) == 1
