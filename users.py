@@ -29,12 +29,16 @@ def check_user(user: types.User):
   return False
 
 
+def is_group_bot():
+  return hasattr(env, "GROUP_ID")
+
+
 def check_group(chat_id):
   return chat_id != env.GROUP_ID
 
 
 def is_user_not_allowed(message: types.Message):
-  if hasattr(env, "GROUP_ID"):
+  if is_group_bot():
     return check_group(message.chat.id)
 
   return check_user(message.from_user)
@@ -64,7 +68,7 @@ async def has_access(message: types.Message):
   if is_user_banned(user_id):
     return False
 
-  if not check_group(message.chat.id) and message.reply_to_message is not None:
+  if is_group_bot() and not check_group(message.chat.id) and message.reply_to_message is not None:
     return message.reply_to_message.from_user.id == message.bot.id
 
   return True
