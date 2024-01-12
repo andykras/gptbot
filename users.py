@@ -65,7 +65,7 @@ async def has_access(message: types.Message):
     return False
 
   if not check_group(message.chat.id) and message.reply_to_message is not None:
-    return message.reply_to_message.from_user.is_bot
+    return message.reply_to_message.from_user.id == message.bot.id
 
   return True
 
