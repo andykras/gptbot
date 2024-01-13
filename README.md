@@ -1,6 +1,6 @@
 # ChatGPT Telegram Bot
 
-This project is a Telegram bot that uses OpenAI's Assistant API to bring ChatGPT to Telegram. It uses the AsyncOpenAI client and aiogram lib  
+This project is a Telegram bot that uses OpenAI's Assistant API to bring ChatGPT to Telegram. It uses the AsyncOpenAI client and aiogram lib
 
 <div align="center">
   <img src="tg.jpg" alt="GPT Bot Image">
@@ -57,7 +57,6 @@ Interact with your ChatGPT bot via Telegram
 - Ensure all prerequisites are met and environment variables are set before starting the bot.
 - Modify `allowed_users.yaml`, `threads.yaml`, and `tutors.yaml` as needed to customize the bot's behavior.
 
-
 ```bash
 $ LC_ALL=ru_RU python -m gptbot | lolcat
 INFO:aiogram.dispatcher:Start polling
@@ -83,7 +82,6 @@ INFO:actions:done
 INFO:aiogram.event:Update id=96266760 is handled. Duration 3059 ms by bot id=*******
 ```
 
-
 ## Tests
 
 To run tests:
@@ -93,23 +91,21 @@ pip install pytest pytest-asyncio freezegun
 pytest -vv test.py
 ```
 
-| Test Case                                        | Status  | Progress |
-|--------------------------------------------------|---------|----------|
-| test_retrieve_existing_thread                    | PASSED  |  7%      |
-| test_clear_context                               | PASSED  | 15%      |
-| test_cache_thread_expiration                     | PASSED  | 23%      |
-| test_create_thread_for_new_user                  | PASSED  | 30%      |
-| test_get_list_of_assistants                      | PASSED  | 38%      |
-| test_get_current_assistant                       | PASSED  | 46%      |
-| test_change_assistant                            | PASSED  | 53%      |
-| test_defaults                                    | PASSED  | 61%      |
-| test_check_allowed_users[123-True]               | PASSED  | 69%      |
-| test_check_allowed_users[456-True]               | PASSED  | 76%      |
-| test_check_allowed_users[789-False]              | PASSED  | 84%      |
-| test_multiple_users_message_handling[user_order0-messages0] | PASSED  | 92%      |
-| test_multiple_users_message_handling[user_order1-messages1] | PASSED  | 100%     |
-
-Total tests: 13, Passed: 13, Duration: 1.69s
+| Test Case                                   | Status |
+| ------------------------------------------- | :----: |
+| test_retrieve_existing_thread               |   ✅   |
+| test_clear_context                          |   ✅   |
+| test_cache_thread_expiration                |   ✅   |
+| test_create_thread_for_new_user             |   ✅   |
+| test_get_list_of_assistants                 |   ✅   |
+| test_get_current_assistant                  |   ✅   |
+| test_change_assistant                       |   ✅   |
+| test_defaults                               |   ✅   |
+| test_check_allowed_users[123-True]          |   ✅   |
+| test_check_allowed_users[456-True]          |   ✅   |
+| test_check_allowed_users[789-False]         |   ✅   |
+| test_multiple_requests[order: user1, user2] |   ✅   |
+| test_multiple_requests[order: user2, user1] |   ✅   |
 
 ## Deploy
 

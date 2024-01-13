@@ -29,7 +29,6 @@ class QueueController:
     messages = QueueController.data[thread.id].queue[user_id]
     message_time = messages[-1].date.timestamp()
 
-    await asyncio.sleep(0)
     while time.time() - message_time < delay:
       time_to_wait = message_time + delay - time.time()
 
