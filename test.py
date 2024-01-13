@@ -1,10 +1,13 @@
 import pytest
+import time
+import asyncio
 from datetime import datetime, timedelta
 from freezegun import freeze_time
-from unittest.mock import AsyncMock, patch, mock_open
+from unittest.mock import MagicMock, AsyncMock, patch, mock_open
 from pathlib import Path
 from .threads_factory import threads_factory
 from .assistants_factory import assistants_factory
+from .message_queues import QueueController, thread_lock
 
 
 def load_mock_data(file_name):
@@ -89,7 +92,7 @@ async def test_defaults():
     mock_tutors_file.assert_called_with(Path(__file__).parent / "tutors.yaml", 'r')
 
 
-@pytest.mark.parametrize("user_id,expected", [
+@pytest.mark.parametrize("user_id, expected", [
     (123, True),
     (456, True),
     (789, False),
@@ -100,3 +103,73 @@ def test_check_allowed_users(user_id, expected):
     from collections import namedtuple
     UserMock = namedtuple("UserMock", ["id", "username"])
     assert not check_user(UserMock(id=user_id, username=user_id)) == expected
+
+
+def get_expected_texts_by_order(messages, order):
+  texts_by_user = {user.id: [] for user in order}
+  for msg in messages:
+    texts_by_user[msg["user"].id].append(msg["text"])
+  expected_texts = []
+  for user in order:
+    expected_texts.extend(texts_by_user[user.id])
+  return expected_texts
+
+
+async def run_test_with_order_and_messages(user_order, messages):
+  add_messages_to_thread = AsyncMock()
+  process_message = AsyncMock()
+
+  thread = MagicMock(id="shared_thread")
+  delta = 0.01
+
+  async def handle_response(message):
+    if not QueueController.start_queue(thread, message["mock"]):
+      return
+
+    await QueueController.wait_next(delta, thread, message["user"].id)
+    async with thread_lock(thread.id, message["user"].id) as messages:
+      await add_messages_to_thread(thread, messages)
+      await process_message(thread, MagicMock(), messages[-1])
+
+  current_time = time.time()
+  for msg in messages:
+    msg["mock"] = MagicMock(from_user=msg["user"], text=msg["text"])
+    msg["mock"].date.timestamp.return_value = current_time
+    current_time += delta
+
+  tasks = [asyncio.create_task(handle_response(msg)) for msg in messages]
+  await asyncio.gather(*tasks)
+
+  expected_texts = get_expected_texts_by_order(messages, user_order)
+  actual_texts = [msg.text for call in add_messages_to_thread.call_args_list for msg in call[0][1]]
+
+  assert actual_texts == expected_texts
+  assert process_message.call_count == 2  # total users
+
+
+user1 = MagicMock(id=1)
+user2 = MagicMock(id=2)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "user_order, messages",
+    [
+        ([user1, user2], [
+            {"text": "user1 say 1", "user": user1},
+            {"text": "user2 say 1", "user": user2},
+            {"text": "user1 say 2", "user": user1},
+            {"text": "user1 say 3", "user": user1},
+            {"text": "user2 say 2", "user": user2},
+        ]),
+        ([user2, user1], [
+            {"text": "user1 say 1", "user": user1},
+            {"text": "user2 say 1", "user": user2},
+            {"text": "user1 say 2", "user": user1},
+            {"text": "user2 say 2", "user": user2},
+            {"text": "user1 say 3", "user": user1},
+        ])
+    ]
+)
+async def test_multiple_users_message_handling(user_order, messages):
+  await run_test_with_order_and_messages(user_order, messages)
