@@ -44,7 +44,7 @@ export BOT_TOKEN="..."
 
 ## Running the Bot
 
-To start the bot, run:
+To start the bot, run it from the upper-level dir:
 
 ```bash
 python -m gptbot
