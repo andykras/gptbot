@@ -66,7 +66,8 @@ class ColorFormatter(logging.Formatter):
     message = self._restore_links(message)
     message = self._restore_numbers(message)
 
-    return f"{level}:{module}:{message}"
+    timestamp = self.formatTime(record, "%Y-%m-%d %H:%M:%S")
+    return f"{timestamp} {level}:{module}:{message}"
 
   def get_hash(self, data):
     base64_encoded = base64.b64encode(hashlib.sha1(data.encode()).digest()).decode()
