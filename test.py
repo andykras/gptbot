@@ -105,6 +105,25 @@ def test_check_allowed_users(user_id, expected):
     assert not check_user(UserMock(id=user_id, username=user_id)) == expected
 
 
+class MsgBuilder:
+  def __init__(self):
+    self.messages = []
+    self.count = {}
+
+  def user(self, user_id):
+    self.count[user_id] = self.count.get(user_id, 0) + 1
+    text = f"user{user_id} say {self.count[user_id]}"
+    self.messages.append({"text": text, "user_id": user_id})
+    return self
+
+  def build(self):
+    return self.messages
+
+
+def create_messages(user_map, messages_data):
+  return [{"text": msg_data["text"], "user": user_map[msg_data["user_id"]]} for msg_data in messages_data]
+
+
 def get_expected_texts_by_order(messages, order):
   texts_by_user = {user.id: [] for user in order}
   for msg in messages:
@@ -131,7 +150,7 @@ async def run_test_with_order_and_messages(user_order, messages):
       await add_messages_to_thread(thread, messages)
       await process_message(thread, MagicMock(), messages[-1])
 
-  current_time = time.time()
+  current_time = time.time() + delta
   for msg in messages:
     msg["mock"] = MagicMock(from_user=msg["user"], text=msg["text"])
     msg["mock"].date.timestamp.return_value = current_time
@@ -147,29 +166,13 @@ async def run_test_with_order_and_messages(user_order, messages):
   assert process_message.call_count == 2  # total users
 
 
-user1 = MagicMock(id=1)
-user2 = MagicMock(id=2)
-
-
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "user_order, messages",
-    [
-        ([user1, user2], [
-            {"text": "user1 say 1", "user": user1},
-            {"text": "user2 say 1", "user": user2},
-            {"text": "user1 say 2", "user": user1},
-            {"text": "user1 say 3", "user": user1},
-            {"text": "user2 say 2", "user": user2},
-        ]),
-        ([user2, user1], [
-            {"text": "user1 say 1", "user": user1},
-            {"text": "user2 say 1", "user": user2},
-            {"text": "user1 say 2", "user": user1},
-            {"text": "user2 say 2", "user": user2},
-            {"text": "user1 say 3", "user": user1},
-        ])
-    ]
-)
-async def test_multiple_users_message_handling(user_order, messages):
-  await run_test_with_order_and_messages(user_order, messages)
+@pytest.mark.parametrize("users, messages_data", [
+    ([MagicMock(id=1), MagicMock(id=2)], MsgBuilder().user(1).user(2).user(1).user(1).user(2).build()),
+    ([MagicMock(id=2), MagicMock(id=1)], MsgBuilder().user(1).user(2).user(1).user(2).user(1).build())
+],
+    ids=["order: user1, user2", "order: user2, user1"])
+async def test_multiple_requests(users, messages_data):
+  user_map = {user.id: user for user in users}
+  messages = create_messages(user_map, messages_data)
+  await run_test_with_order_and_messages(users, messages)
