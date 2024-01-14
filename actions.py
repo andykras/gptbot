@@ -7,7 +7,7 @@ from aiogram import types
 from .client import client, get_thread, get_assistant
 from .logger import create_logger
 from .translate import _t
-from . import env
+from . import config
 from .helpers import ChatActions, is_valid_markdown, escape_markdown
 from .users import is_group_bot
 from .message_queues import QueueController, thread_lock
@@ -39,7 +39,7 @@ async def handle_response(message: types.Message):
   assistant = await get_assistant(user_id)
   logger.debug(f"handle_response:{assistant}")
 
-  delay = env.GROUP_BOT_RESPONSE_DELAY if is_group_bot() else env.BOT_RESPONSE_DELAY
+  delay = config.GROUP_BOT_RESPONSE_DELAY if is_group_bot() else config.BOT_RESPONSE_DELAY
   if delay > 0:
     await QueueController.wait_next(delay, thread, user_id)
 
@@ -74,7 +74,7 @@ async def process_message(thread: beta.Thread, assistant: beta.Assistant, messag
       break
     else:
       await ChatActions.send_typing(message)
-      await asyncio.sleep(env.RUN_STATUS_POLL_INTERVAL)
+      await asyncio.sleep(config.RUN_STATUS_POLL_INTERVAL)
 
     run = await client.beta.threads.runs.retrieve(
         run.id,
