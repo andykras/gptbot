@@ -33,8 +33,8 @@ def is_group_bot():
   return hasattr(env, "GROUP_ID")
 
 
-def reply_to_bot():
-  return hasattr(env, "REPLY_TO_BOT") and env.REPLY_TO_BOT
+def chat_to_other_bots():
+  return hasattr(env, "CHAT_TO_OTHER_BOTS") and env.CHAT_TO_OTHER_BOTS
 
 
 def check_group(chat_id):
@@ -73,10 +73,13 @@ async def has_access(message: types.Message):
     return False
 
   if is_group_bot() and message.reply_to_message is not None:
-    if reply_to_bot():
+    if chat_to_other_bots():
       return message.reply_to_message.from_user.is_bot
 
-    return message.reply_to_message.from_user.id == message.bot.id
+    return (
+        message.reply_to_message.from_user.id == message.bot.id  # replied to me (the bot)
+        or message.reply_to_message.from_user.first_name == "Telegram"  # replied to postponed messages in the group
+    )
 
   return True
 
@@ -85,6 +88,7 @@ async def access_middleware(handler, message: types.Message, data):
   logger.debug(f"middleware:{message}")
 
   if message.text is None:
+    logger.debug(f"blocked:message.text={message.text}")
     return
 
   if message.text == "/start" or await has_access(message):
