@@ -8,7 +8,7 @@ from .client import client, get_thread, get_assistant
 from .logger import create_logger
 from .translate import _t
 from . import env
-from .helpers import is_valid_markdown, escape_markdown
+from .helpers import ChatActions, is_valid_markdown, escape_markdown
 from .users import is_group_bot
 from .message_queues import QueueController, thread_lock
 
@@ -73,6 +73,7 @@ async def process_message(thread: beta.Thread, assistant: beta.Assistant, messag
       logger.info("process_message:failed")
       break
     else:
+      await ChatActions.send_typing(message)
       await asyncio.sleep(env.RUN_STATUS_POLL_INTERVAL)
 
     run = await client.beta.threads.runs.retrieve(
