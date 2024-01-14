@@ -33,6 +33,10 @@ def is_group_bot():
   return hasattr(env, "GROUP_ID")
 
 
+def reply_to_bot():
+  return hasattr(env, "REPLY_TO_BOT") and env.REPLY_TO_BOT
+
+
 def check_group(chat_id):
   return chat_id != env.GROUP_ID
 
@@ -69,6 +73,9 @@ async def has_access(message: types.Message):
     return False
 
   if is_group_bot() and message.reply_to_message is not None:
+    if reply_to_bot():
+      return message.reply_to_message.from_user.is_bot
+
     return message.reply_to_message.from_user.id == message.bot.id
 
   return True
