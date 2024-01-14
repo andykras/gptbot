@@ -1,7 +1,7 @@
 import yaml
 from .logger import create_logger
 from .translate import _t
-from . import env
+from . import config
 from pathlib import Path
 from aiogram import types
 
@@ -30,15 +30,15 @@ def check_user(user: types.User):
 
 
 def is_group_bot():
-  return hasattr(env, "GROUP_ID")
+  return hasattr(config, "GROUP_ID")
 
 
 def chat_to_other_bots():
-  return hasattr(env, "CHAT_TO_OTHER_BOTS") and env.CHAT_TO_OTHER_BOTS
+  return hasattr(config, "CHAT_TO_OTHER_BOTS") and config.CHAT_TO_OTHER_BOTS
 
 
 def check_group(chat_id):
-  return chat_id != env.GROUP_ID
+  return chat_id != config.GROUP_ID
 
 
 def is_user_not_allowed(message: types.Message):
